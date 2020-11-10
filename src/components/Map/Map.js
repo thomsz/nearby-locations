@@ -1,11 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
 
 const MapContainer = (props) => {
 	const { google, currentLocation, lat, lng, nearbyCities } = props;
 
-	const onMarkerClickHandler = () => {
-		console.log('Clicked a marker');
+	const [showInfo, setShowInfo] = useState(false);
+	const [selectedMarker, setSelectedMarker] = useState(null);
+	const [selectedLocation, setSelectedLocation] = useState(null);
+	const [selectedLocationInfo, setSelectedLocationInfo] = useState({});
+
+	const onMarkerClickHandler = (props, marker, e) => {
+		const { name, distance, population } = props;
+		setSelectedMarker(marker);
+		setSelectedLocation(name);
+		setSelectedLocationInfo({ distance, population });
+		setShowInfo(true);
 	};
 
 	const onInfoWindowCloseHandler = () => {
@@ -13,19 +22,52 @@ const MapContainer = (props) => {
 	};
 
 	const nearbyMarkers = nearbyCities.map(
-		({ name, lat, lng, distance, location }) => (
-			<Marker key={name} name={name} position={{ lat, lng }} />
+		({ name, lat, lng, distance, population }) => (
+			<Marker
+				key={name}
+				name={name}
+				position={{ lat, lng }}
+				distance={distance}
+				population={population}
+				onClick={onMarkerClickHandler}
+			/>
 		)
 	);
 
-	return (
-		<Map google={google} zoom={11} initialCenter={{ lat, lng }}>
-			<Marker name={'Pin A'} position={{ lat, lng }} />
-			{nearbyMarkers}
+	const clickMapHandler = () => {
+		if (showInfo) {
+			setShowInfo(false);
+			setSelectedLocation(null);
+			setSelectedMarker(null);
+		}
+	};
 
-			<InfoWindow onClose={onInfoWindowCloseHandler}>
+	return (
+		<Map
+			google={google}
+			zoom={11}
+			initialCenter={{ lat, lng }}
+			onClick={clickMapHandler}
+		>
+			<Marker
+				name={currentLocation}
+				position={{ lat, lng }}
+				onClick={onMarkerClickHandler}
+			/>
+			{nearbyMarkers}
+			<InfoWindow
+				marker={selectedMarker}
+				onClose={onInfoWindowCloseHandler}
+				visible={showInfo}
+			>
 				<div>
-					<h1>{currentLocation}</h1>
+					<h1>{selectedLocation}</h1>
+					Temperature:
+					<br />
+					Population: {selectedLocationInfo.population}
+					<br />
+					Distance: {selectedLocationInfo.distance}
+					<br />
 				</div>
 			</InfoWindow>
 		</Map>

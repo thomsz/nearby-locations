@@ -34,12 +34,6 @@ const App = () => {
 							lng,
 						} = geocodeRes.results[0].geometry.location;
 
-						setCurrentLocation(searchQuery);
-						setLat(lat);
-						setLng(lng);
-						setLoading(false);
-						console.log(lat, lng);
-
 						const radius = 20;
 
 						const { statusText, data } = await axios.get(
@@ -61,7 +55,9 @@ const App = () => {
 									name,
 									population,
 								} = geonames[i];
+
 								nearbyCities.push({
+									id: i,
 									name,
 									distance,
 									population,
@@ -69,6 +65,11 @@ const App = () => {
 									lng,
 								});
 							}
+
+							setCurrentLocation(searchQuery);
+							setLat(lat);
+							setLng(lng);
+							setLoading(false);
 							setNearbyCities(nearbyCities);
 						}
 					}
