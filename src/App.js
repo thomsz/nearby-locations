@@ -12,6 +12,7 @@ const App = () => {
 	const [currentLocation, setCurrentLocation] = useState('');
 	const [lat, setLat] = useState(null);
 	const [lng, setLng] = useState(null);
+	const [nearbyCities, setNearbyCities] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [isFirstRender, setIsFirstRender] = useState(true);
 
@@ -25,17 +26,51 @@ const App = () => {
 		searchQuery !== '' &&
 			(async () => {
 				try {
-					const response = await geocode.fromAddress(searchQuery);
+					const geocodeRes = await geocode.fromAddress(searchQuery);
 
-					if (response) {
+					if (geocodeRes) {
 						const {
 							lat,
 							lng,
-						} = response.results[0].geometry.location;
+						} = geocodeRes.results[0].geometry.location;
+
 						setCurrentLocation(searchQuery);
 						setLat(lat);
 						setLng(lng);
 						setLoading(false);
+						console.log(lat, lng);
+
+						const radius = 20;
+
+						const { statusText, data } = await axios.get(
+							`http://api.geonames.org/findNearbyPlaceNameJSON?lat=${lat}&lng=${lng}&radius=${radius}&cities=cities15000&username=${process.env.REACT_APP_GEONAMES_USERNAME}`
+						);
+						const { geonames } = data;
+
+						if (statusText === 'OK' && geonames.length > 0) {
+							const nearbyCities = [];
+							for (
+								let i = 1;
+								i <= 3 && i < geonames.length;
+								i++
+							) {
+								const {
+									distance,
+									lat,
+									lng,
+									name,
+									population,
+								} = geonames[i];
+								nearbyCities.push({
+									name,
+									distance,
+									population,
+									lat,
+									lng,
+								});
+							}
+							setNearbyCities(nearbyCities);
+						}
 					}
 				} catch (error) {
 					console.log(error);
@@ -60,7 +95,12 @@ const App = () => {
 			) : loading ? (
 				<h2>Loading...</h2>
 			) : (
-				<Map currentLocation={currentLocation} lat={lat} lng={lng} />
+				<Map
+					currentLocation={currentLocation}
+					lat={lat}
+					lng={lng}
+					nearbyCities={nearbyCities}
+				/>
 			)}
 		</div>
 	);

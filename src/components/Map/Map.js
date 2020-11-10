@@ -2,7 +2,7 @@ import React from 'react';
 import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
 
 const MapContainer = (props) => {
-	const { google, currentLocation, lat, lng } = props;
+	const { google, currentLocation, lat, lng, nearbyCities } = props;
 
 	const onMarkerClickHandler = () => {
 		console.log('Clicked a marker');
@@ -12,11 +12,16 @@ const MapContainer = (props) => {
 		console.log('Closed info window');
 	};
 
+	const nearbyMarkers = nearbyCities.map(
+		({ name, lat, lng, distance, location }) => (
+			<Marker key={name} name={name} position={{ lat, lng }} />
+		)
+	);
+
 	return (
-		<Map google={google} zoom={10} initialCenter={{ lat, lng }}>
+		<Map google={google} zoom={11} initialCenter={{ lat, lng }}>
 			<Marker name={'Pin A'} position={{ lat, lng }} />
-			<Marker name={'Pin B'} position={{ lat: 33.1, lng: 34.7018 }} />
-			<Marker name={'Pin C'} position={{ lat: 33.1, lng: 34.7018 }} />
+			{nearbyMarkers}
 
 			<InfoWindow onClose={onInfoWindowCloseHandler}>
 				<div>
