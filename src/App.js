@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Input } from 'antd';
 import './App.css';
+import Map from './components/Map/Map';
 
 const { Search } = Input;
 
@@ -9,7 +10,6 @@ const App = () => {
 
 	const onSearch = (input) => {
 		setSearchQuery(input);
-		console.log('submitted', input);
 	};
 
 	return (
@@ -20,6 +20,7 @@ const App = () => {
 				style={{ width: 200 }}
 			/>
 			<h2>{searchQuery}</h2>
+			<Map />
 		</div>
 	);
 };

@@ -1,0 +1,40 @@
+import React, { useState } from 'react';
+import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
+
+const MapContainer = (props) => {
+	const { google } = props;
+
+	const [currentLocation, setCurrentLocation] = useState('Test location');
+
+	const onMarkerClickHandler = () => {
+		console.log('Clicked a marker');
+	};
+
+	const onInfoWindowCloseHandler = () => {
+		console.log('Closed info window');
+	};
+
+	return (
+		<Map
+			google={google}
+			initialCenter={{
+				lat: 32.0853,
+				lng: 34.7818,
+			}}
+		>
+			<Marker name={'Pin A'} position={{ lat: 32.1, lng: 34.7818 }} />
+			<Marker name={'Pin B'} position={{ lat: 33.1, lng: 34.7018 }} />
+			<Marker name={'Pin C'} position={{ lat: 33.1, lng: 34.7018 }} />
+
+			<InfoWindow onClose={onInfoWindowCloseHandler}>
+				<div>
+					<h1>{currentLocation}</h1>
+				</div>
+			</InfoWindow>
+		</Map>
+	);
+};
+
+export default GoogleApiWrapper({
+	apiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+})(MapContainer);
