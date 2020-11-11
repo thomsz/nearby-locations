@@ -13,17 +13,37 @@ const MapContainer = (props) => {
 	const [selectedLocation, setSelectedLocation] = useState(null);
 	const [selectedLocationInfo, setSelectedLocationInfo] = useState({});
 
+	const currentWeather = async (position) => {
+		const unit = 'metric';
+		const { lat, lng } = position;
+
+		try {
+			const response = await axios.get(
+				`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lng}&appid=${process.env.REACT_APP_OPENWEATHERMAP_API_KEY}&units=${unit}`
+			);
+
+			if (response.status === 200) {
+				const temperature = response.data.current.temp;
+
+				return temperature;
+			} else throw new Error('Could not fetch temperature');
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	const onMarkerClickHandler = async (props, marker) => {
 		let { name, distance, population, position } = props;
 
+		// format population 000,000 / n/a
 		population = format(population);
 
 		// validate distance and restrict it to 3 digits after the dot
-		distance =
-			distance !== undefined
-				? distance.toString().match(/^-?\d+(?:\.\d{0,3})?/)[0]
-				: 'n/a';
+		distance = distance
+			? distance.toString().match(/^-?\d+(?:\.\d{0,3})?/)[0]
+			: 'n/a';
 
+		// get weather
 		const temperature = await currentWeather(position);
 
 		setSelectedMarker(marker);
@@ -53,25 +73,6 @@ const MapContainer = (props) => {
 		}
 	};
 
-	const currentWeather = async (position) => {
-		const unit = 'metric';
-		const { lat, lng } = position;
-
-		try {
-			const response = await axios.get(
-				`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lng}&appid=${process.env.REACT_APP_OPENWEATHERMAP_API_KEY}&units=${unit}`
-			);
-
-			if (response.status === 200) {
-				const temperature = response.data.current.temp;
-
-				return temperature;
-			} else throw new Error('Could not fetch temperature');
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
 	const valueStyle = { fontSize: 16 };
 
 	return (
@@ -91,31 +92,33 @@ const MapContainer = (props) => {
 			/>
 			{nearbyMarkers}
 			<InfoWindow marker={selectedMarker} visible={showInfo}>
-				<h2>{selectedLocation}</h2>
-				<Row gutter={20} style={{ margin: 0 }}>
-					<Col span={8}>
-						<Statistic
-							title="Temperature"
-							value={`${selectedLocationInfo.temperature}`}
-							suffix="°C"
-							valueStyle={valueStyle}
-						/>
-					</Col>
-					<Col span={8}>
-						<Statistic
-							title="Population"
-							value={selectedLocationInfo.population}
-							valueStyle={valueStyle}
-						/>
-					</Col>
-					<Col span={8}>
-						<Statistic
-							title="Distance"
-							value={`${selectedLocationInfo.distance}km`}
-							valueStyle={valueStyle}
-						/>
-					</Col>
-				</Row>
+				<div>
+					<h2>{selectedLocation}</h2>
+					<Row gutter={20} style={{ margin: 0 }}>
+						<Col span={8}>
+							<Statistic
+								title="Temperature"
+								value={`${selectedLocationInfo.temperature}`}
+								suffix="°C"
+								valueStyle={valueStyle}
+							/>
+						</Col>
+						<Col span={8}>
+							<Statistic
+								title="Population"
+								value={selectedLocationInfo.population}
+								valueStyle={valueStyle}
+							/>
+						</Col>
+						<Col span={8}>
+							<Statistic
+								title="Distance"
+								value={`${selectedLocationInfo.distance}km`}
+								valueStyle={valueStyle}
+							/>
+						</Col>
+					</Row>
+				</div>
 			</InfoWindow>
 		</Map>
 	);
