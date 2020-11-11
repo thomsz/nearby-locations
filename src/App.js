@@ -101,8 +101,13 @@ const App = () => {
 			</div>
 			{isFirstRender ? (
 				<div className="container">
-					<Placeholder style={{ height: 500 }} />
-					<h2>Search for a location to get started</h2>
+					<Placeholder style={{ height: 400 }} />
+					<h1 style={{ color: '#525252' }}>
+						The modern approach to
+						<br />
+						<span className="placeholderBold">search</span> for cool
+						places <span className="placeholderBold">near you</span>
+					</h1>
 				</div>
 			) : loading ? (
 				<div className="container">

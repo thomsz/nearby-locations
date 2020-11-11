@@ -20,3 +20,15 @@
 	align-items: center;
 	flex-direction: column-reverse;
 }
+
+.placeholderBold {
+	font-weight: bold;
+}
+
+.placeholderBold:first-of-type {
+	box-shadow: 0 5px 0 0px #b587ff;
+}
+
+.placeholderBold:nth-of-type(2) {
+	box-shadow: 0 5px 0 0px #79c3f4;
+}
