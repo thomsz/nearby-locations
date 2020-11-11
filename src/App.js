@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import geocode from 'react-geocode';
 import axios from 'axios';
-import { Input } from 'antd';
+import { Input, Spin } from 'antd';
 import './App.css';
 import Map from './components/Map/Map';
+import { capitalize } from './utils/utils';
+import { ReactComponent as Placeholder } from './images/map1.svg';
 
 const { Search } = Input;
 
@@ -80,21 +82,38 @@ const App = () => {
 	}, [searchQuery]);
 
 	const onSearch = (input) => {
-		setSearchQuery(input);
+		setSearchQuery(capitalize(input));
 	};
 
 	return (
 		<div className="App">
-			<Search
-				placeholder="input search text"
-				onSearch={onSearch}
-				style={{ width: 200 }}
-			/>
-			<h2>{searchQuery}</h2>
+			<div className="Header">
+				<div className="column">
+					<Search
+						placeholder="input search text"
+						onSearch={onSearch}
+						style={{ width: 200 }}
+						allowClear={true}
+					/>
+				</div>
+				<div className="column">
+					<h2>{searchQuery}</h2>
+				</div>
+			</div>
 			{isFirstRender ? (
-				<h2>Search for a location</h2>
+				<div className="container">
+					<Placeholder style={{ height: 400 }} />
+					<h1 style={{ color: '#525252' }}>
+						The modern approach to
+						<br />
+						<span className="placeholderBold">search</span> for cool
+						places <span className="placeholderBold">near you</span>
+					</h1>
+				</div>
 			) : loading ? (
-				<h2>Loading...</h2>
+				<div className="container">
+					<Spin size="large" />
+				</div>
 			) : (
 				<Map
 					currentLocation={currentLocation}
