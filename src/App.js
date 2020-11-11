@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import geocode from 'react-geocode';
 import axios from 'axios';
-import { Input } from 'antd';
+import { Input, Spin } from 'antd';
 import './App.css';
 import Map from './components/Map/Map';
 
@@ -99,9 +99,13 @@ const App = () => {
 				</div>
 			</div>
 			{isFirstRender ? (
-				<h2>Search for a location</h2>
+				<div className="container">
+					<h2>Search for a location</h2>
+				</div>
 			) : loading ? (
-				<h2>Loading...</h2>
+				<div className="container">
+					<Spin size="large" />
+				</div>
 			) : (
 				<Map
 					currentLocation={currentLocation}

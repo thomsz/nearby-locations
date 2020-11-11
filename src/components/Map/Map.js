@@ -76,6 +76,7 @@ const MapContainer = (props) => {
 			zoom={11}
 			initialCenter={{ lat, lng }}
 			onClick={clickMapHandler}
+			containerStyle={{ height: 'calc(100vh - 90px)' }}
 		>
 			<Marker
 				name={currentLocation}

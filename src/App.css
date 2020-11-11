@@ -1,5 +1,6 @@
 .App {
 	text-align: center;
+	overflow: hidden;
 }
 
 .Header {
@@ -10,4 +11,11 @@
 
 .column {
 	width: 50%;
+}
+
+.container {
+	height: calc(100vh - 90px);
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
