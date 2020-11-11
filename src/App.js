@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import geocode from 'react-geocode';
 import axios from 'axios';
-import { Input, Spin } from 'antd';
+import { Spin } from 'antd';
 import './App.css';
 import Map from './components/Map/Map';
-import { capitalize } from './utils/utils';
+import SearchField from './components/SearchField/SearchField';
 import { ReactComponent as Placeholder } from './images/map1.svg';
-
-const { Search } = Input;
 
 const App = () => {
 	const [searchQuery, setSearchQuery] = useState('');
@@ -42,6 +40,7 @@ const App = () => {
 							`http://api.geonames.org/findNearbyPlaceNameJSON?lat=${lat}&lng=${lng}&radius=${radius}&cities=cities15000&username=${process.env.REACT_APP_GEONAMES_USERNAME}`
 						);
 						const { geonames } = data;
+						console.log(geonames);
 
 						if (statusText === 'OK' && geonames.length > 0) {
 							const nearbyCities = [];
@@ -89,28 +88,25 @@ const App = () => {
 		}
 	}, [searchQuery]);
 
-	const onSearch = (input) => {
-		setSearchQuery(capitalize(input));
-	};
-
 	return (
 		<div className="App">
-			<div className="Header">
-				<div className="column">
-					<Search
-						placeholder="input search text"
-						onSearch={onSearch}
-						style={{ width: 200 }}
-						allowClear={true}
-					/>
+			{!showPlaceholder && (
+				<div className="Header">
+					<div className="column">
+						<SearchField setSearchQuery={setSearchQuery} />
+					</div>
+					<div className="column">
+						<h2>{searchQuery}</h2>
+					</div>
 				</div>
-				<div className="column">
-					<h2>{searchQuery}</h2>
-				</div>
-			</div>
+			)}
+
 			{showPlaceholder ? (
-				<div className="container">
+				<div className="container" style={{ paddingTop: 50 }}>
 					<Placeholder style={{ height: 400 }} />
+					<div style={{ padding: 20 }}>
+						<SearchField setSearchQuery={setSearchQuery} />
+					</div>
 					<h1 style={{ color: '#525252' }}>
 						The modern approach to
 						<br />
