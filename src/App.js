@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Input, Spin } from 'antd';
 import './App.css';
 import Map from './components/Map/Map';
+import { ReactComponent as Placeholder } from './images/map1.svg';
 
 const { Search } = Input;
 
@@ -100,7 +101,8 @@ const App = () => {
 			</div>
 			{isFirstRender ? (
 				<div className="container">
-					<h2>Search for a location</h2>
+					<Placeholder style={{ height: 500 }} />
+					<h2>Search for a location to get started</h2>
 				</div>
 			) : loading ? (
 				<div className="container">
