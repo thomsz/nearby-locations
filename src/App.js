@@ -85,12 +85,19 @@ const App = () => {
 
 	return (
 		<div className="App">
-			<Search
-				placeholder="input search text"
-				onSearch={onSearch}
-				style={{ width: 200 }}
-			/>
-			<h2>{searchQuery}</h2>
+			<div className="Header">
+				<div className="column">
+					<Search
+						placeholder="input search text"
+						onSearch={onSearch}
+						style={{ width: 200 }}
+						allowClear={true}
+					/>
+				</div>
+				<div className="column">
+					<h2>{searchQuery}</h2>
+				</div>
+			</div>
 			{isFirstRender ? (
 				<h2>Search for a location</h2>
 			) : loading ? (
