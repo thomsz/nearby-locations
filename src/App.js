@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Input, Spin } from 'antd';
 import './App.css';
 import Map from './components/Map/Map';
+import { capitalize } from './utils/utils';
 import { ReactComponent as Placeholder } from './images/map1.svg';
 
 const { Search } = Input;
@@ -81,7 +82,7 @@ const App = () => {
 	}, [searchQuery]);
 
 	const onSearch = (input) => {
-		setSearchQuery(input);
+		setSearchQuery(capitalize(input));
 	};
 
 	return (
