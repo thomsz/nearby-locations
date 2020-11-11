@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { format } from '../../utils/utils';
+import { Statistic, Row, Col } from 'antd';
 import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
 
 const MapContainer = (props) => {
@@ -89,15 +90,31 @@ const MapContainer = (props) => {
 				onClose={onInfoWindowCloseHandler}
 				visible={showInfo}
 			>
-				<div>
-					<h1>{selectedLocation}</h1>
-					Temperature: {selectedLocationInfo.temperature}°C
-					<br />
-					Population: {selectedLocationInfo.population}
-					<br />
-					Distance: {selectedLocationInfo.distance}
-					<br />
-				</div>
+				<h2>{selectedLocation}</h2>
+				<Row gutter={20} style={{ margin: 0 }}>
+					<Col span={8}>
+						<Statistic
+							title="Temperature"
+							value={`${selectedLocationInfo.temperature}`}
+							suffix="°C"
+							valueStyle={{ fontSize: 16 }}
+						/>
+					</Col>
+					<Col span={8}>
+						<Statistic
+							title="Population"
+							value={selectedLocationInfo.population}
+							valueStyle={{ fontSize: 16 }}
+						/>
+					</Col>
+					<Col span={8}>
+						<Statistic
+							title="Distance"
+							value={`${selectedLocationInfo.distance}m`}
+							valueStyle={{ fontSize: 16 }}
+						/>
+					</Col>
+				</Row>
 			</InfoWindow>
 		</Map>
 	);
