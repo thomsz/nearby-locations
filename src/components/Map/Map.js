@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { format } from '../../utils/utils';
 import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
 
 const MapContainer = (props) => {
@@ -11,7 +12,10 @@ const MapContainer = (props) => {
 	const [selectedLocationInfo, setSelectedLocationInfo] = useState({});
 
 	const onMarkerClickHandler = async (props, marker) => {
-		const { name, distance, population, position } = props;
+		let { name, distance, population, position } = props;
+
+		population = format(population);
+		distance = distance !== undefined ? distance : 'n/a';
 
 		const temperature = await currentWeather(position);
 
@@ -86,7 +90,7 @@ const MapContainer = (props) => {
 			>
 				<div>
 					<h1>{selectedLocation}</h1>
-					Temperature: {selectedLocationInfo.temperature}
+					Temperature: {selectedLocationInfo.temperature}°C
 					<br />
 					Population: {selectedLocationInfo.population}
 					<br />
