@@ -1,31 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import geocode from 'react-geocode';
 import axios from 'axios';
-import { Input, Spin } from 'antd';
+import { Spin } from 'antd';
 import './App.css';
 import Map from './components/Map/Map';
-import { capitalize } from './utils/utils';
+import SearchField from './components/SearchField/SearchField';
 import { ReactComponent as Placeholder } from './images/map1.svg';
-
-const { Search } = Input;
 
 const App = () => {
 	const [searchQuery, setSearchQuery] = useState('');
-	const [currentLocation, setCurrentLocation] = useState('');
-	const [lat, setLat] = useState(null);
-	const [lng, setLng] = useState(null);
+	const [currentLocation, setCurrentLocation] = useState({});
 	const [nearbyCities, setNearbyCities] = useState([]);
 	const [loading, setLoading] = useState(true);
-	const [isFirstRender, setIsFirstRender] = useState(true);
+	const [showPlaceholder, setShowPlaceholder] = useState(true);
 
 	useEffect(() => {
-		isFirstRender && searchQuery !== '' && setIsFirstRender(false);
-		setLoading(true);
+		if (searchQuery === '') {
+			setShowPlaceholder(true);
+		} else {
+			showPlaceholder && setShowPlaceholder(false);
+			setLoading(true);
 
-		// Set Geocode API key
-		geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
+			// Set Geocode API key
+			geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
 
-		searchQuery !== '' &&
 			(async () => {
 				try {
 					const geocodeRes = await geocode.fromAddress(searchQuery);
@@ -42,11 +40,13 @@ const App = () => {
 							`http://api.geonames.org/findNearbyPlaceNameJSON?lat=${lat}&lng=${lng}&radius=${radius}&cities=cities15000&username=${process.env.REACT_APP_GEONAMES_USERNAME}`
 						);
 						const { geonames } = data;
+						console.log(geonames);
 
 						if (statusText === 'OK' && geonames.length > 0) {
 							const nearbyCities = [];
+
 							for (
-								let i = 1;
+								let i = 0;
 								i <= 3 && i < geonames.length;
 								i++
 							) {
@@ -58,19 +58,25 @@ const App = () => {
 									population,
 								} = geonames[i];
 
-								nearbyCities.push({
-									id: i,
-									name,
-									distance,
-									population,
-									lat,
-									lng,
-								});
+								if (i === 0) {
+									setCurrentLocation({
+										name: searchQuery,
+										distance: 0,
+										population,
+										lat,
+										lng,
+									});
+								} else
+									nearbyCities.push({
+										id: i,
+										name,
+										distance,
+										population,
+										lat,
+										lng,
+									});
 							}
 
-							setCurrentLocation(searchQuery);
-							setLat(lat);
-							setLng(lng);
 							setLoading(false);
 							setNearbyCities(nearbyCities);
 						}
@@ -79,30 +85,28 @@ const App = () => {
 					console.log(error);
 				}
 			})();
+		}
 	}, [searchQuery]);
-
-	const onSearch = (input) => {
-		setSearchQuery(capitalize(input));
-	};
 
 	return (
 		<div className="App">
-			<div className="Header">
-				<div className="column">
-					<Search
-						placeholder="input search text"
-						onSearch={onSearch}
-						style={{ width: 200 }}
-						allowClear={true}
-					/>
+			{!showPlaceholder && (
+				<div className="Header">
+					<div className="column">
+						<SearchField setSearchQuery={setSearchQuery} />
+					</div>
+					<div className="column">
+						<h2>{searchQuery}</h2>
+					</div>
 				</div>
-				<div className="column">
-					<h2>{searchQuery}</h2>
-				</div>
-			</div>
-			{isFirstRender ? (
-				<div className="container">
+			)}
+
+			{showPlaceholder ? (
+				<div className="container" style={{ paddingTop: 50 }}>
 					<Placeholder style={{ height: 400 }} />
+					<div style={{ padding: 20 }}>
+						<SearchField setSearchQuery={setSearchQuery} />
+					</div>
 					<h1 style={{ color: '#525252' }}>
 						The modern approach to
 						<br />
@@ -117,8 +121,6 @@ const App = () => {
 			) : (
 				<Map
 					currentLocation={currentLocation}
-					lat={lat}
-					lng={lng}
 					nearbyCities={nearbyCities}
 				/>
 			)}
