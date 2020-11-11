@@ -11,9 +11,7 @@ const { Search } = Input;
 
 const App = () => {
 	const [searchQuery, setSearchQuery] = useState('');
-	const [currentLocation, setCurrentLocation] = useState('');
-	const [lat, setLat] = useState(null);
-	const [lng, setLng] = useState(null);
+	const [currentLocation, setCurrentLocation] = useState({});
 	const [nearbyCities, setNearbyCities] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [isFirstRender, setIsFirstRender] = useState(true);
@@ -45,8 +43,9 @@ const App = () => {
 
 						if (statusText === 'OK' && geonames.length > 0) {
 							const nearbyCities = [];
+
 							for (
-								let i = 1;
+								let i = 0;
 								i <= 3 && i < geonames.length;
 								i++
 							) {
@@ -58,19 +57,25 @@ const App = () => {
 									population,
 								} = geonames[i];
 
-								nearbyCities.push({
-									id: i,
-									name,
-									distance,
-									population,
-									lat,
-									lng,
-								});
+								if (i === 0) {
+									setCurrentLocation({
+										name: searchQuery,
+										distance: 0,
+										population,
+										lat,
+										lng,
+									});
+								} else
+									nearbyCities.push({
+										id: i,
+										name,
+										distance,
+										population,
+										lat,
+										lng,
+									});
 							}
 
-							setCurrentLocation(searchQuery);
-							setLat(lat);
-							setLng(lng);
 							setLoading(false);
 							setNearbyCities(nearbyCities);
 						}
@@ -117,8 +122,6 @@ const App = () => {
 			) : (
 				<Map
 					currentLocation={currentLocation}
-					lat={lat}
-					lng={lng}
 					nearbyCities={nearbyCities}
 				/>
 			)}
