@@ -5,7 +5,8 @@ import { Statistic, Row, Col } from 'antd';
 import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
 
 const MapContainer = (props) => {
-	const { google, currentLocation, lat, lng, nearbyCities } = props;
+	const { google, currentLocation, nearbyCities } = props;
+	const { lat, lng } = currentLocation;
 
 	const [showInfo, setShowInfo] = useState(false);
 	const [selectedMarker, setSelectedMarker] = useState(null);
@@ -16,7 +17,12 @@ const MapContainer = (props) => {
 		let { name, distance, population, position } = props;
 
 		population = format(population);
-		distance = distance !== undefined ? distance : 'n/a';
+
+		// validate distance and restrict it to 3 digits after the dot
+		distance =
+			distance !== undefined
+				? distance.toString().match(/^-?\d+(?:\.\d{0,3})?/)[0]
+				: 'n/a';
 
 		const temperature = await currentWeather(position);
 
@@ -24,10 +30,6 @@ const MapContainer = (props) => {
 		setSelectedLocation(name);
 		setSelectedLocationInfo({ distance, population, temperature });
 		setShowInfo(true);
-	};
-
-	const onInfoWindowCloseHandler = () => {
-		console.log('Closed info window');
 	};
 
 	const nearbyMarkers = nearbyCities.map(
@@ -60,7 +62,6 @@ const MapContainer = (props) => {
 				`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lng}&appid=${process.env.REACT_APP_OPENWEATHERMAP_API_KEY}&units=${unit}`
 			);
 
-			console.log('weather response', response);
 			if (response.status === 200) {
 				const temperature = response.data.current.temp;
 
@@ -71,6 +72,8 @@ const MapContainer = (props) => {
 		}
 	};
 
+	const valueStyle = { fontSize: 16 };
+
 	return (
 		<Map
 			google={google}
@@ -80,16 +83,14 @@ const MapContainer = (props) => {
 			containerStyle={{ height: 'calc(100vh - 90px)' }}
 		>
 			<Marker
-				name={currentLocation}
+				name={currentLocation.name}
 				position={{ lat, lng }}
+				distance={currentLocation.distance}
+				population={currentLocation.population}
 				onClick={onMarkerClickHandler}
 			/>
 			{nearbyMarkers}
-			<InfoWindow
-				marker={selectedMarker}
-				onClose={onInfoWindowCloseHandler}
-				visible={showInfo}
-			>
+			<InfoWindow marker={selectedMarker} visible={showInfo}>
 				<h2>{selectedLocation}</h2>
 				<Row gutter={20} style={{ margin: 0 }}>
 					<Col span={8}>
@@ -97,21 +98,21 @@ const MapContainer = (props) => {
 							title="Temperature"
 							value={`${selectedLocationInfo.temperature}`}
 							suffix="°C"
-							valueStyle={{ fontSize: 16 }}
+							valueStyle={valueStyle}
 						/>
 					</Col>
 					<Col span={8}>
 						<Statistic
 							title="Population"
 							value={selectedLocationInfo.population}
-							valueStyle={{ fontSize: 16 }}
+							valueStyle={valueStyle}
 						/>
 					</Col>
 					<Col span={8}>
 						<Statistic
 							title="Distance"
-							value={`${selectedLocationInfo.distance}m`}
-							valueStyle={{ fontSize: 16 }}
+							value={`${selectedLocationInfo.distance}km`}
+							valueStyle={valueStyle}
 						/>
 					</Col>
 				</Row>

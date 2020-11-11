@@ -11,21 +11,21 @@ const { Search } = Input;
 
 const App = () => {
 	const [searchQuery, setSearchQuery] = useState('');
-	const [currentLocation, setCurrentLocation] = useState('');
-	const [lat, setLat] = useState(null);
-	const [lng, setLng] = useState(null);
+	const [currentLocation, setCurrentLocation] = useState({});
 	const [nearbyCities, setNearbyCities] = useState([]);
 	const [loading, setLoading] = useState(true);
-	const [isFirstRender, setIsFirstRender] = useState(true);
+	const [showPlaceholder, setShowPlaceholder] = useState(true);
 
 	useEffect(() => {
-		isFirstRender && searchQuery !== '' && setIsFirstRender(false);
-		setLoading(true);
+		if (searchQuery === '') {
+			setShowPlaceholder(true);
+		} else {
+			showPlaceholder && setShowPlaceholder(false);
+			setLoading(true);
 
-		// Set Geocode API key
-		geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
+			// Set Geocode API key
+			geocode.setApiKey(process.env.REACT_APP_GOOGLE_MAPS_API_KEY);
 
-		searchQuery !== '' &&
 			(async () => {
 				try {
 					const geocodeRes = await geocode.fromAddress(searchQuery);
@@ -45,8 +45,9 @@ const App = () => {
 
 						if (statusText === 'OK' && geonames.length > 0) {
 							const nearbyCities = [];
+
 							for (
-								let i = 1;
+								let i = 0;
 								i <= 3 && i < geonames.length;
 								i++
 							) {
@@ -58,19 +59,25 @@ const App = () => {
 									population,
 								} = geonames[i];
 
-								nearbyCities.push({
-									id: i,
-									name,
-									distance,
-									population,
-									lat,
-									lng,
-								});
+								if (i === 0) {
+									setCurrentLocation({
+										name: searchQuery,
+										distance: 0,
+										population,
+										lat,
+										lng,
+									});
+								} else
+									nearbyCities.push({
+										id: i,
+										name,
+										distance,
+										population,
+										lat,
+										lng,
+									});
 							}
 
-							setCurrentLocation(searchQuery);
-							setLat(lat);
-							setLng(lng);
 							setLoading(false);
 							setNearbyCities(nearbyCities);
 						}
@@ -79,6 +86,7 @@ const App = () => {
 					console.log(error);
 				}
 			})();
+		}
 	}, [searchQuery]);
 
 	const onSearch = (input) => {
@@ -100,7 +108,7 @@ const App = () => {
 					<h2>{searchQuery}</h2>
 				</div>
 			</div>
-			{isFirstRender ? (
+			{showPlaceholder ? (
 				<div className="container">
 					<Placeholder style={{ height: 400 }} />
 					<h1 style={{ color: '#525252' }}>
@@ -117,8 +125,6 @@ const App = () => {
 			) : (
 				<Map
 					currentLocation={currentLocation}
-					lat={lat}
-					lng={lng}
 					nearbyCities={nearbyCities}
 				/>
 			)}
