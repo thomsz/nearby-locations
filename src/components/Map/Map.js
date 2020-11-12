@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { format } from '../../utils/utils';
+import currentWeather from '../../model/getWeather';
 import { Statistic, Row, Col } from 'antd';
 import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
 
@@ -12,25 +12,6 @@ const MapContainer = (props) => {
 	const [selectedMarker, setSelectedMarker] = useState(null);
 	const [selectedLocation, setSelectedLocation] = useState(null);
 	const [selectedLocationInfo, setSelectedLocationInfo] = useState({});
-
-	const currentWeather = async (position) => {
-		const unit = 'metric';
-		const { lat, lng } = position;
-
-		try {
-			const response = await axios.get(
-				`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lng}&appid=${process.env.REACT_APP_OPENWEATHERMAP_API_KEY}&units=${unit}`
-			);
-
-			if (response.status === 200) {
-				const temperature = response.data.current.temp;
-
-				return temperature;
-			} else throw new Error('Could not fetch temperature');
-		} catch (error) {
-			console.error(error);
-		}
-	};
 
 	const onMarkerClickHandler = async (props, marker) => {
 		let { name, distance, population, position } = props;
@@ -84,6 +65,7 @@ const MapContainer = (props) => {
 			onClick={clickMapHandler}
 			containerStyle={{ height: 'calc(100vh - 90px)' }}
 		>
+			{/** searched location marker */}
 			<Marker
 				name={currentLocation.name}
 				position={{ lat, lng }}
@@ -91,6 +73,7 @@ const MapContainer = (props) => {
 				population={currentLocation.population}
 				onClick={onMarkerClickHandler}
 			/>
+
 			{nearbyMarkers}
 			<InfoWindow marker={selectedMarker} visible={showInfo}>
 				<div>
