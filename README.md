@@ -25,6 +25,7 @@ npm start
 ```
 
 ## Run Tests
+First, configure your local host and port in cypress.json file. Then run
 
 ```
 npm test
