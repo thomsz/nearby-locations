@@ -35,13 +35,14 @@ const MapContainer = (props) => {
 	const onMarkerClickHandler = async (props, marker) => {
 		let { name, distance, population, position } = props;
 
-		// format population 000,000 / n/a
+		// format population - 000,000 or n/a
 		population = format(population);
 
 		// validate distance and restrict it to 3 digits after the dot
-		distance = distance
-			? distance.toString().match(/^-?\d+(?:\.\d{0,3})?/)[0]
-			: 'n/a';
+		distance =
+			distance !== undefined
+				? distance.toString().match(/^-?\d+(?:\.\d{0,3})?/)[0]
+				: 'n/a';
 
 		// get weather
 		const temperature = await currentWeather(position);
@@ -93,7 +94,7 @@ const MapContainer = (props) => {
 			{nearbyMarkers}
 			<InfoWindow marker={selectedMarker} visible={showInfo}>
 				<div>
-					<h2>{selectedLocation}</h2>
+					<h2 class="markerTitle">{selectedLocation}</h2>
 					<Row gutter={20} style={{ margin: 0 }}>
 						<Col span={8}>
 							<Statistic
