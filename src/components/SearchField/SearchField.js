@@ -7,9 +7,7 @@ const { Search } = Input;
 const SearchField = (props) => {
 	const { setSearchQuery } = props;
 
-	const onSearch = (input) => {
-		setSearchQuery(capitalize(input));
-	};
+	const onSearch = (input) => setSearchQuery(capitalize(input));
 
 	return (
 		<Search
